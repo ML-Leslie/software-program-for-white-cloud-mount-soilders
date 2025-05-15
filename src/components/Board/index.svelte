@@ -5,6 +5,7 @@
 	import { settings } from '@sudoku/stores/settings';
 	import { cursor } from '@sudoku/stores/cursor';
 	import { candidates } from '@sudoku/stores/candidates';
+	import { possibleNumberSwitch, possibleNumbers } from '@sudoku/stores/possibleNumbers';
 	import Cell from './Cell.svelte';
 
 	function isSelected(cursorStore, x, y) {
@@ -27,6 +28,19 @@
 
 		return gridStore[cursorStore.y][cursorStore.x];
 	}
+
+	function getCandidateValues(gridStore, switchStore) {
+		let candidatesValues;
+		if (switchStore) {
+			possibleNumbers.fresh(gridStore);
+			candidatesValues = $possibleNumbers;
+		} else {
+			candidatesValues = $candidates;
+		}
+		return candidatesValues;
+	} 
+
+	
 </script>
 
 <div class="board-padding relative z-10">
@@ -42,7 +56,7 @@
 					<Cell {value}
 					      cellY={y + 1}
 					      cellX={x + 1}
-					      candidates={$candidates[x + ',' + y]}
+					      candidates={getCandidateValues($userGrid, $possibleNumberSwitch)[x + ',' + y]}
 					      disabled={$gamePaused}
 					      selected={isSelected($cursor, x, y)}
 					      userNumber={$grid[y][x] === 0}

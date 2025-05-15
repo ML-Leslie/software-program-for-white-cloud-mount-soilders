@@ -1,5 +1,6 @@
 <script>
 	import { CANDIDATE_COORDS } from '@sudoku/constants';
+	import { possibleNumberSwitch, possibleNumbers } from '@sudoku/stores/possibleNumbers';
 
 	export let candidates = [];
 </script>
@@ -8,7 +9,8 @@
 	{#each CANDIDATE_COORDS as [row, col], index}
 		<div class="candidate row-start-{row} col-start-{col}"
 		     class:invisible={!candidates.includes(index + 1)}
-		     class:visible={candidates.includes(index + 1)}>
+		     class:visible={candidates.includes(index + 1)}
+			 class:possible-number={$possibleNumberSwitch}>
 			{index + 1}
 		</div>
 	{/each}
@@ -21,5 +23,9 @@
 
 	.candidate {
 		@apply h-full w-full row-end-auto col-end-auto leading-full;
+	}
+
+	.possible-number {
+		@apply text-green-800;
 	}
 </style>

@@ -26,6 +26,6 @@
 	}
 
 	.possible-number {
-		@apply text-green-800;
+		@apply text-gray-400;
 	}
 </style>

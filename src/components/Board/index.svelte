@@ -29,13 +29,13 @@
 		return gridStore[cursorStore.y][cursorStore.x];
 	}
 
-	function getCandidateValues(gridStore, switchStore) {
+	function getCandidateValues(candidateStore, switchStore) {
 		let candidatesValues;
 		if (switchStore) {
-			possibleNumbers.fresh(gridStore);
+			possibleNumbers.fresh($userGrid);
 			candidatesValues = $possibleNumbers;
 		} else {
-			candidatesValues = $candidates;
+			candidatesValues = candidateStore;
 		}
 		return candidatesValues;
 	} 
@@ -56,7 +56,7 @@
 					<Cell {value}
 					      cellY={y + 1}
 					      cellX={x + 1}
-					      candidates={getCandidateValues($userGrid, $possibleNumberSwitch)[x + ',' + y]}
+					      candidates={getCandidateValues($candidates, $possibleNumberSwitch)[x + ',' + y]}
 					      disabled={$gamePaused}
 					      selected={isSelected($cursor, x, y)}
 					      userNumber={$grid[y][x] === 0}

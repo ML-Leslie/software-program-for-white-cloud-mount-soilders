@@ -47,11 +47,11 @@
 		@apply text-gray-400;
 	}
 
-	.backtracking-right-number {
-		@apply text-green-500;
-	}
+	/* .backtracking-right-number {
+		@apply bg-green-500;
+	} */
 
 	.backtracking-wrong-number {
-		@apply text-red-500;
+		@apply bg-red-500;
 	}
 </style>

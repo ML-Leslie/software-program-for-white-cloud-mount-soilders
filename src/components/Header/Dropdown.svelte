@@ -27,13 +27,23 @@
 		dropdownVisible = false;
 		game.pause();
 
-		modal.show('confirm', {
-			title: 'Create Own',
-			text: 'Switch to the creator mode to create your own Sudoku puzzle?',
+		// modal.show('confirm', {
+		// 	title: 'Create Own',
+		// 	text: 'Switch to the creator mode to create your own Sudoku puzzle?',
+		// 	button: 'Continue',
+		// 	onHide: game.resume,
+		// 	callback: () => {
+		// 		//game.startCreatorMode();
+		// 	},
+		// });
+
+		modal.show('prompt', {
+			title: 'Import from SudokuWiki',
+			text: 'Enter a url from SudokuWiki to start!!!',
 			button: 'Continue',
 			onHide: game.resume,
-			callback: () => {
-				//game.startCreatorMode();
+			callback: (url) => {
+				game.startByImport(url);
 			},
 		});
 	}

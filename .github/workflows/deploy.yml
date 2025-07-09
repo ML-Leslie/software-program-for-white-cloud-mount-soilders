@@ -1,39 +1,44 @@
-name: Deploy
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - master
-
-permissions:
-  contents: write
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build-deploy:
-    name: Build & Deploy
+  build-and-deploy:
     runs-on: ubuntu-latest
 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2
-        with:
-          persist-credentials: false
-
-      - name: Setup 🔧
-        uses: actions/setup-node@v1.4.4
-
-      - name: Install ♻
-        run: npm install
-
-      - name: Build 🏗
-        run: npm run build
-
-      - name: CNAME 🧾
-        run: echo sudoku.jonasgeiler.com > dist/CNAME
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.6.1
-        with:
-          folder: dist
-          git-config-name: github-actions[bot]
-          git-config-email: 41898282+github-actions[bot]@users.noreply.github.com
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install --force
+      
+    - name: Comment out postcss-clean in rollup.config.js
+      run: sed -i '20s/^/\/\/ /' rollup.config.js
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

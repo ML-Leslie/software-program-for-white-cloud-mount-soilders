@@ -38,6 +38,11 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Modified Reference Path
+        run: |
+          sed -i 's|"/|"./|g' dist/manifest.json
+          sed -i 's|="/|="./|g' dist/index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

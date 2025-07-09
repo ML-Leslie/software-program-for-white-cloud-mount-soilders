@@ -1,0 +1,32 @@
+@startuml
+title "序列图: 请求提示 (学习模式)"
+
+actor Player
+participant "Actions.svelte" as Actions
+participant "solver.js" as Solver
+participant "userGrid.js" as UserGridStore
+participant "hints.js" as HintsStore
+
+Player -> Actions: 点击 "Learn" 按钮
+activate Actions
+Actions -> UserGridStore: 获取当前 grid
+Actions -> Solver: possibleNumberSolver(grid)
+activate Solver
+
+Solver -> Solver: getPossibleNumber(grid)
+Solver -> Solver: nakedSingle(candidates)
+opt 未找到 nakedSingle
+    Solver -> Solver: hiddenSingle(candidates)
+end
+
+Solver --> Actions: 返回 move = {idx, value}, message = "nakedSingle"
+deactivate Solver
+
+Actions -> HintsStore: useHint()
+activate HintsStore
+HintsStore --> Actions
+deactivate HintsStore
+
+Actions -> UserGridStore: set(move.pos, move.value)
+deactivate Actions
+@enduml

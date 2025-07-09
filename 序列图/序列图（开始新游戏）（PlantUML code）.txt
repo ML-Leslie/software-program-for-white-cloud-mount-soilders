@@ -1,0 +1,29 @@
+@startuml
+title "序列图: 开始新游戏"
+
+actor Player
+participant "Dropdown.svelte" as Dropdown
+participant "game.js" as Game
+participant "stores" as Stores
+
+Player -> Dropdown: 点击 "New Game"
+activate Dropdown
+Dropdown -> Player: 显示难度选项
+deactivate Dropdown
+
+Player -> Dropdown: 选择难度 ('easy')
+activate Dropdown
+Dropdown -> Game: startNew('easy')
+activate Game
+
+Game -> Stores: difficulty.set('easy')
+Game -> Stores: grid.generate('easy')
+Game -> Stores: timer.reset()
+Game -> Stores: hints.reset()
+Game -> Stores: record.reset()
+Game -> Stores: branchPoints.reset()
+Game -> Stores: history.reset()
+
+deactivate Game
+deactivate Dropdown
+@enduml

@@ -1,0 +1,50 @@
+@startuml
+title "序列图: 撤销与重做"
+
+actor Player
+participant "Actions.svelte" as Actions
+participant "record.js" as RecordStore
+participant "userGrid.js" as UserGridStore
+
+== 用户操作，记录历史 ==
+Player -> UserGridStore: 填入数字
+activate UserGridStore
+UserGridStore -> RecordStore: do(action)
+note right: action = [{row, col, oldValue, newValue}]
+activate RecordStore
+RecordStore -> RecordStore: undoStack.push(action)
+RecordStore -> RecordStore: redoStack = []
+RecordStore -> RecordStore: updateAbilityStates()
+deactivate RecordStore
+deactivate UserGridStore
+
+== 玩家请求撤销 ==
+Player -> Actions: 点击 "Undo" 按钮
+activate Actions
+Actions -> RecordStore: undo()
+activate RecordStore
+RecordStore -> RecordStore: prevAction = undoStack.pop()
+RecordStore -> RecordStore: redoStack.push(prevAction)
+RecordStore -> RecordStore: updateAbilityStates()
+RecordStore --> Actions: 返回 prevAction
+deactivate RecordStore
+
+Actions -> UserGridStore: set(pos, prevAction.oldValue)
+note right: 根据撤销信息恢复棋盘
+deactivate Actions
+
+== 玩家请求重做 ==
+Player -> Actions: 点击 "Redo" 按钮
+activate Actions
+Actions -> RecordStore: redo()
+activate RecordStore
+RecordStore -> RecordStore: nextAction = redoStack.pop()
+RecordStore -> RecordStore: undoStack.push(nextAction)
+RecordStore -> RecordStore: updateAbilityStates()
+RecordStore --> Actions: 返回 nextAction
+deactivate RecordStore
+
+Actions -> UserGridStore: set(pos, nextAction.newValue)
+note right: 根据重做信息恢复棋盘
+deactivate Actions
+@enduml

@@ -1,0 +1,56 @@
+@startuml
+[*] --> Initializing
+
+state Initializing {
+  [*] --> CheckingURL
+  CheckingURL --> LoadingFromURL: URL has puzzle data
+  CheckingURL --> Welcome: URL has no puzzle data
+  LoadingFromURL --> Gaming: grid.decodeSencode(data)
+  Welcome --> Gaming: startNew(difficulty)
+  Welcome --> CustomInput: show('prompt')
+  CustomInput --> Gaming: startCustom(sencode)
+}
+
+state Gaming {
+  state Active {
+    [*] --> NumberMode
+    NumberMode --> NoteMode: notes.toggle()
+    NoteMode --> NumberMode: notes.toggle()
+
+    state NumberMode {
+      NumberMode: Default mode for entering numbers
+    }
+
+    state NoteMode {
+      NoteMode: Mode for adding candidate notes
+    }
+
+    Active: handleKey(number) [In NumberMode]
+    Active: candidates.add(pos, number) [In NoteMode]
+    Active: handleHint()
+    Active: handleLearn()
+    Active: handleBackTracking()
+    Active: handleUndo()
+    Active: handleRedo()
+  }
+
+  Active --> Paused: pauseGame()
+  Paused --> Active: resumeGame()
+  Active --> GameWon: Check on userGrid change
+}
+
+Gaming --> Settings: show('settings')
+Settings --> Gaming: hide()
+
+Gaming --> Share: show('share')
+Share --> Gaming: hide()
+
+Gaming --> ConfirmNewGame: newGame()
+ConfirmNewGame --> Gaming: hide()
+ConfirmNewGame -down-> Initializing: startNew()
+
+GameWon --> GameOver: show('gameover')
+GameOver --> Initializing: startNew()
+GameOver --> Gaming: hide()
+
+@enduml

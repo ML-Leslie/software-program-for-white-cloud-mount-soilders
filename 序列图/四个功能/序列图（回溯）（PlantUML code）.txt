@@ -1,0 +1,40 @@
+@startuml
+title "序列图: 回溯到分支点"
+
+actor Player
+participant "Actions.svelte" as Actions
+participant "history.js" as HistoryStore
+participant "branchPoints.js" as BranchStore
+participant "userGrid.js" as UserGridStore
+participant "wrongNumber.js" as WrongNumberStore
+
+Player -> Actions: 点击 "Backtrack" 按钮
+activate Actions
+
+Actions -> BranchStore: 获取最后一个分支点 (lastBranchStep)
+activate BranchStore
+BranchStore --> Actions: 返回 step 索引
+deactivate BranchStore
+
+Actions -> HistoryStore: 获取从分支点至今的历史记录 (stepsToUndo)
+activate HistoryStore
+HistoryStore --> Actions: 返回操作列表
+deactivate HistoryStore
+
+loop 对每个要撤销的操作
+    Actions -> UserGridStore: set(pos, 0)
+    note right: 将单元格恢复为空
+end
+
+Actions -> HistoryStore: 移除已撤销的历史记录
+activate HistoryStore
+HistoryStore -> BranchStore: (内部) 同步分支点，移除无效索引
+deactivate HistoryStore
+
+Actions -> BranchStore: 移除最后一个分支点
+activate BranchStore
+deactivate BranchStore
+
+Actions -> WrongNumberStore: set(wrongNumber + 1)
+deactivate Actions
+@enduml

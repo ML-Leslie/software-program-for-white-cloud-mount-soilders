@@ -1,0 +1,36 @@
+@startuml
+title "序列图: 从 URL 导入数独"
+
+actor Player
+participant "Prompt.svelte" as PromptModal
+participant "game.js" as Game
+participant "grid.js" as GridStore
+participant "message.js" as MessageStore
+
+Player -> PromptModal: 粘贴URL并点击"OK"
+activate PromptModal
+PromptModal -> Game: startByImport(url)
+activate Game
+
+Game -> Game: parseSudokuFromUrl(url)
+activate Game
+Game -> Game: new URL(url).searchParams.get('bd')
+alt URL 或 'bd' 参数无效
+    Game --> Game: 抛出错误
+    Game --> Game: 捕获错误
+    Game -> MessageStore: set("导入失败")
+    Game --> PromptModal
+    deactivate Game
+    deactivate PromptModal
+    [-> Player: 显示错误消息
+else 'bd' 参数有效
+    Game -> Game: 解析字符串为 9x9 数组 (board)
+    Game --> Game: 返回 board
+    deactivate Game
+    
+    Game -> GridStore: set(board)
+    Game -> Game: 调用 reset() 重置其他 stores
+    deactivate Game
+    deactivate PromptModal
+end
+@enduml

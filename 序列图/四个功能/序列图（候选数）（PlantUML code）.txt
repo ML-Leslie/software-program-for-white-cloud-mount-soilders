@@ -1,0 +1,48 @@
+@startuml
+title "序列图: 计算和显示候选数"
+
+actor Player
+participant "PossibleNumberSwitch.svelte" as Switch
+participant "possibleNumbers.js" as PnStore
+participant "solver.js" as Solver
+participant "userGrid.js" as UserGridStore
+participant "Cell.svelte" as Cell
+
+Player -> Switch: 点击 "Show Possible Numbers"
+activate Switch
+Switch -> PnStore: toggle()
+activate PnStore
+
+alt "开关被激活"
+    PnStore -> UserGridStore: get(userGrid)
+    activate UserGridStore
+    UserGridStore --> PnStore: 返回当前棋盘 (grid)
+    deactivate UserGridStore
+
+    PnStore -> Solver: getPossibleNumber(grid)
+    activate Solver
+    loop for each empty cell
+        Solver -> Solver: getOnePossibleNumber(grid, cellIndex)
+    end
+    Solver --> PnStore: 返回所有空格的候选数 (pn)
+    deactivate Solver
+
+    PnStore -> PnStore: fresh(grid)
+    note right: 格式化候选数并更新 store
+
+    PnStore -> Cell: (Svelte 响应式更新)
+    activate Cell
+    Cell -> Cell: 显示候选数
+    deactivate Cell
+else "开关被关闭"
+    PnStore -> PnStore: off()
+    PnStore -> Cell: (Svelte 响应式更新)
+    activate Cell
+    Cell -> Cell: 隐藏候选数
+    deactivate Cell
+end
+
+deactivate PnStore
+deactivate Switch
+
+@enduml

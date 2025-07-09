@@ -1,0 +1,40 @@
+@startuml
+title "序列图: 玩家填写数字"
+
+actor Player
+participant "Cell.svelte" as Cell
+participant "Keyboard.svelte" as Keyboard
+participant "cursor.js" as CursorStore
+participant "userGrid.js" as UserGridStore
+participant "solver.js" as Solver
+participant "history.js" as HistoryStore
+participant "branchPoints.js" as BranchStore
+
+Player -> Cell: 点击单元格 (x, y)
+activate Cell
+Cell -> CursorStore: set(x, y)
+deactivate Cell
+
+Player -> Keyboard: 点击数字 '5'
+activate Keyboard
+Keyboard -> UserGridStore: set({x, y}, 5)
+activate UserGridStore
+
+UserGridStore -> HistoryStore: add({x, y})
+activate HistoryStore
+HistoryStore --> UserGridStore: 返回更新后的历史记录长度
+deactivate HistoryStore
+
+UserGridStore -> Solver: getOnePossibleNumber(grid, cellIndex)
+activate Solver
+Solver --> UserGridStore: 返回候选数列表 [2, 5]
+deactivate Solver
+
+alt onePossibleNumber.length == 2
+    UserGridStore -> BranchStore: add(history.length - 1)
+end
+
+UserGridStore -> UserGridStore: 更新棋盘数组
+deactivate UserGridStore
+deactivate Keyboard
+@enduml
